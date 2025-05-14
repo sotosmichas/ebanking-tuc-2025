@@ -1,6 +1,8 @@
 package com.bank.model;
 
-public abstract class User {
+import com.bank.storage.Storable;
+
+public abstract class User implements Storable {
 protected String username;
 protected String fullName;
 protected String password;
@@ -28,4 +30,12 @@ protected String vat;
     public String getFullName() {
         return fullName;
     }
+    public String toString() {
+        return "username: " + ", password: " + password + ", fullName: " + fullName + ", vat:" + vat;
+    }
+    @Override
+    public String marshal() {
+        return getClass().getSimpleName() + "," + username + "," + password + "," + fullName + "," + vat;
+    }
+
 }

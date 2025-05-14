@@ -34,4 +34,9 @@ protected double  interestRate;
         }
         return false;
     }
+
+    public String toString() {
+        return "IBAN: " + iban + ", Balance: " + balance + ", Owner VAT: " + ownerVat;
+    }
+
 }
