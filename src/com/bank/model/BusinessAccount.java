@@ -1,13 +1,12 @@
 package com.bank.model;
 
-public class BusinessAccount extends BankAccount{
-    private final double maintenaceFee;
-    public BusinessAccount(String iban, String ownerVat, double interestRate,double maintanceFee) {
-        super(iban, ownerVat, interestRate);
-        this.maintenaceFee = maintanceFee;
-    }
+import java.time.LocalDate;
 
-    public double getMaintenaceFee() {
-        return maintenaceFee;
+public class BusinessAccount extends BankAccount {
+
+
+    public BusinessAccount(String iban, double balance, String ownerVat, LocalDate dateCreated, double interestRate) {
+        super(iban, balance, ownerVat, dateCreated, interestRate);
+
     }
 }

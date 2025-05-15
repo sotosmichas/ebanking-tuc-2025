@@ -32,13 +32,7 @@ public class UserManager {
             return null;
     }
 
-    public User getUserByVat(String vat) {
-        for (User u : users.values()) {
-            if (u.getVat().equals(vat))
-                return u;
-        }
-        return null;
-    }
+
 
     public Map<String, User> getAllUsers() {
         return users;

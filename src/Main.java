@@ -21,5 +21,11 @@ public class Main {
         userManager.addUser(user);
         System.out.println(userManager.getAllUsers());
         UserManager.getInstance().login("giannis","2006");
-        }
+
+                String workingDir = System.getProperty("user.dir");
+                System.out.println("Project path: " + workingDir);
+
+
+
+    }
     }

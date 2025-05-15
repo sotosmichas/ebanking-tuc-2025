@@ -3,15 +3,14 @@ package com.bank.model;
 import com.bank.storage.Storable;
 
 public abstract class User implements Storable {
-protected String username;
-protected String fullName;
-protected String password;
-protected String vat;
+    protected String username;
+    protected String fullName;
+    protected String password;
 
-    public User(String username, String password,String fullName,String vat) {
+
+    public User(String username, String password, String fullName) {
         this.username = username;
         this.password = password;
-        this.vat = vat;
         this.fullName = fullName;
     }
 
@@ -23,19 +22,17 @@ protected String vat;
         return password;
     }
 
-    public String getVat() {
-        return vat;
-    }
-
     public String getFullName() {
         return fullName;
     }
+
     public String toString() {
-        return "username: " + ", password: " + password + ", fullName: " + fullName + ", vat:" + vat;
+        return "username: " + ", password: " + password + ", fullName: " + fullName;
     }
+
     @Override
     public String marshal() {
-        return getClass().getSimpleName() + "," + username + "," + password + "," + fullName + "," + vat;
+        return getClass().getSimpleName() + "," + username + "," + password + "," + fullName;
     }
 
 }
