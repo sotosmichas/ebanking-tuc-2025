@@ -14,7 +14,7 @@ public abstract class BankAccount implements Storable {
     public BankAccount(String iban, double balance, String ownerVat, LocalDate dateCreated, double interestRate) {
         this.iban = iban;
         this.ownerVat = ownerVat;
-        this.balance = 0;
+        this.balance = balance;
         this.interestRate = interestRate;
         this.dateCreated = dateCreated;
     }
