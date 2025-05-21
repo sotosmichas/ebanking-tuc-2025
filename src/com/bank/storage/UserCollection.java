@@ -43,26 +43,31 @@ public class UserCollection implements Storable {
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
 
-            String[] parts = line.split(",");
-            if (parts.length < 4) continue;
+            String[] fields = line.split(",");
+            String type = null, username = null, password = null, fullName = null, vatOrSsn = null;
 
-            String type = parts[0];
-            String username = parts[1];
-            String password = parts[2];
-            String fullName = parts[3];
+            for (String field : fields) {
+                String[] parts = field.split(":", 2);
+                if (parts.length < 2) continue;
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+
+                switch (key) {
+                    case "type" -> type = value;
+                    case "userName" -> username = value;
+                    case "password" -> password = value;
+                    case "legalName" -> fullName = value;
+                    case "vatNumber" -> vatOrSsn = value;
+                }
+            }
 
             User user = null;
-
-            switch (type) {
-                case "Individual" -> {
-                    if (parts.length >= 5)
-                        user = new Individual(username, password, fullName, parts[4].trim());
-                }
-                case "Company" -> {
-                    if (parts.length >= 5)
-                        user = new Company(username, password, fullName, parts[4].trim());
-                }
-                case "Admin" -> user = new Admin(username, password, fullName);
+            if ("Admin".equals(type)) {
+                user = new Admin(username, password, fullName);
+            } else if ("Individual".equals(type)) {
+                user = new Individual(username, password, fullName, vatOrSsn);
+            } else if ("Company".equals(type)) {
+                user = new Company(username, password, fullName, vatOrSsn);
             }
 
             if (user != null) {
@@ -70,5 +75,6 @@ public class UserCollection implements Storable {
             }
         }
     }
+
 
 }

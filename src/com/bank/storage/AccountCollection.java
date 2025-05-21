@@ -1,20 +1,15 @@
 package com.bank.storage;
 
-import com.bank.model.BankAccount;
-import com.bank.model.BusinessAccount;
-import com.bank.model.PersonalAccount;
-import com.bank.model.User;
+import com.bank.managers.UserManager;
+import com.bank.model.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class AccountCollection implements Storable {
     private List<BankAccount> accounts;
 
-    public AccountCollection(List<BankAccount> accounts) {
+    public AccountCollection() {
         this.accounts = new ArrayList<>();
     }
 
@@ -44,39 +39,64 @@ public class AccountCollection implements Storable {
         String[] lines = data.split("\n");
 
         for (String line : lines) {
+            System.out.println("📥 Reading line: " + line);
+
             if (line.trim().isEmpty()) continue;
 
-            String[] parts = line.split(",");
-            if (parts.length < 6) continue;
+            String[] fields = line.split(",");
+            Map<String, String> fieldMap = new HashMap<>();
 
-            String iban = parts[0].trim();
-            double balance = Double.parseDouble(parts[1].trim());
-            double interest = Double.parseDouble(parts[2].trim());
-            String type = parts[3].trim();
-            String ownerVat = parts[4].trim();
-            LocalDate dateCreated = LocalDate.parse(parts[5].trim());
+            for (String field : fields) {
+                String[] parts = field.split(":", 2);
+                if (parts.length == 2) {
+                    fieldMap.put(parts[0].trim(), parts[1].trim());
+                }
+            }
+            System.out.println("🧾 Parsed fields: " + fieldMap);
+            String type = fieldMap.get("type");
+            String iban = fieldMap.get("iban");
+            double balance = Double.parseDouble(fieldMap.get("balance"));
+            double interest = Double.parseDouble(fieldMap.get("rate")); // renamed from 'interest'
+            LocalDate dateCreated = LocalDate.parse(fieldMap.get("dateCreated"));
 
             BankAccount account = null;
 
-            switch (type) {
-                case "Personal" -> {
-                    Set<String> coOwners = new HashSet<>();
-                    if (parts.length > 6) {
-                        for (int i = 6; i < parts.length; i++) {
-                            coOwners.add(parts[i].trim());
+            if ("PersonalAccount".equalsIgnoreCase(type)) {
+                String primaryVat = fieldMap.get("primaryOwner");
+                User u = UserManager.getInstance().getUserByVat(primaryVat);
+                if (!(u instanceof Individual owner)) continue;
+
+                Set<Individual> coOwners = new HashSet<>();
+                for (String key : fieldMap.keySet()) {
+                    if (key.startsWith("coOwner")) {
+                        String coVat = fieldMap.get(key);
+                        User co = UserManager.getInstance().getUserByVat(coVat);
+                        if (co instanceof Individual indCo) {
+                            coOwners.add(indCo);
                         }
                     }
-                    account = new PersonalAccount(iban, balance, ownerVat, dateCreated, interest, coOwners);
                 }
-                case "Business" -> {
-                    account = new BusinessAccount(iban, balance, ownerVat, dateCreated, interest);
-                }
-            }
+
+                account = new PersonalAccount(iban, balance, owner, dateCreated, interest, coOwners);
+            } else if ("BusinessAccount".equalsIgnoreCase(type)) {
+                String companyVat = fieldMap.get("primaryOwner");
+                User u = UserManager.getInstance().getUserByVat(companyVat);
+                if (!(u instanceof Company owner)) continue;
+
+                account = new BusinessAccount(iban, balance, owner, dateCreated, interest);
+
+
+
+        }
+
 
             if (account != null) {
                 addAccount(account);
+                System.out.println("✅ Added account: " + account.getIban());
             }
         }
     }
-    }
+
+}
+
 

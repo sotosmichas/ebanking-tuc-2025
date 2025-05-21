@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Customer extends User {
-    protected List<String> ibans;
+    protected List<BankAccount> ibans;
     private String vat;
 
     public Customer(String username, String password, String fullName, String vat) {
@@ -13,16 +13,16 @@ public abstract class Customer extends User {
         this.vat = vat;
     }
 
-    public List<String> getIbans() {
+    public List<BankAccount> getIbans() {
         return ibans;
     }
 
-    public void addIban(String iban) {
+    /*public void add(String iban) {
         ibans.add(iban);
-    }
+    }*/
 
     public String marshal() {
-        return "Individual," + username + "," + password + "," + fullName + "," + vat;
+        return getClass().getSimpleName() + "," + username + "," + password + "," + fullName + "," + vat;
     }
 
     @Override

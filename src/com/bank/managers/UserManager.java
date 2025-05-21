@@ -1,5 +1,6 @@
 package com.bank.managers;
 
+import com.bank.model.Customer;
 import com.bank.model.User;
 
 import java.util.HashMap;
@@ -7,7 +8,7 @@ import java.util.Map;
 
 public class UserManager {
     private static UserManager instance;
-    private final Map<String, User> users;
+    private  Map<String, User> users;
 
     private UserManager() {
         users = new HashMap<>();
@@ -37,6 +38,20 @@ public class UserManager {
     public Map<String, User> getAllUsers() {
         return users;
     }
+
+    public User getUser(String username) {
+        return users.get(username);
+    }
+    public User getUserByVat(String vat) {
+        for (User u : users.values()) {
+            if (u instanceof Customer c && c.getVat().equals(vat)) {
+                return c;
+            }
+        }
+        return null;
+    }
+
+
 
 }
 

@@ -26,9 +26,12 @@ public abstract class User implements Storable {
         return fullName;
     }
 
+
+    @Override
     public String toString() {
-        return "username: " + ", password: " + password + ", fullName: " + fullName;
+        return "username: " + username + ", password: " + password + ", fullName: " + fullName;
     }
+
 
     @Override
     public String marshal() {
