@@ -12,6 +12,8 @@ public class StatementManager {
     private static StatementManager instance;
     private final Map<String, List<Statements>> statements;
 
+
+
     private StatementManager() {
         statements = new HashMap<>();
     }
@@ -21,6 +23,35 @@ public class StatementManager {
             instance = new StatementManager();
         }
         return instance;
+    }
+
+    public List<Statements> getRecentStatements(String iban, int count) {
+        List<Statements> all = statements.getOrDefault(iban, new ArrayList<>());
+        int fromIndex = Math.max(all.size() - count, 0);
+        return all.subList(fromIndex, all.size());
+    }
+
+    public List<Statements> getStatementsForAccount(String iban) {
+        return new ArrayList<>(statements.getOrDefault(iban, new ArrayList<>()));
+    }
+
+    public List<Statements> getMonthlyStatements(String iban, String monthYear) {
+        List<Statements> result = new ArrayList<>();
+        List<Statements> all = statements.getOrDefault(iban, new ArrayList<>());
+
+        String[] parts = monthYear.split("/");
+        if (parts.length != 2) throw new IllegalArgumentException("Invalid format");
+
+        int month = Integer.parseInt(parts[0]);
+        int year = Integer.parseInt(parts[1]);
+
+        for (Statements s : all) {
+            if (s.getDate().getMonthValue() == month && s.getDate().getYear() == year) {
+                result.add(s);
+            }
+        }
+
+        return result;
     }
 
     public void addStatement(String iban, Statements statement) {

@@ -6,7 +6,7 @@ import com.bank.util.DateUtils;
 import java.time.LocalDate;
 
 public class Bill implements Storable {
-    private String paymentCode;
+    private String RfCode;
     private String billNumber;
     private String issuerVat;
     private String customerVat;
@@ -14,13 +14,14 @@ public class Bill implements Storable {
     private LocalDate issueDate;
     private LocalDate dueDate;
     private boolean paid;
+    private Company issuer;
 
     public Bill() {
 
     }
 
-    public Bill(String paymentCode, String billNumber, String issuerVat, String customerVat, double amount, LocalDate issueDate, LocalDate dueDate) {
-        this.paymentCode = paymentCode;
+    public Bill(String billNumber, String rfCode, Company issuer, String customerVat, double amount, String description, LocalDate dueDate) {
+        this.RfCode = RfCode;
         this.billNumber = billNumber;
         this.issuerVat = issuerVat;
         this.customerVat = customerVat;
@@ -29,9 +30,12 @@ public class Bill implements Storable {
         this.dueDate = dueDate;
 
     }
+    public Company getIssuer() {
+        return issuer;
+    }
 
-    public String getPaymentCode() {
-        return paymentCode;
+    public String getRfCode() {
+        return RfCode;
     }
 
     public String getBillNumber() {
@@ -65,9 +69,10 @@ public class Bill implements Storable {
     public void setPaid(boolean paid) {
         this.paid = paid;
     }
+
     public String marshal() {
         return "type:Bill" +
-                ",paymentCode:" + paymentCode +
+                ",paymentCode:" + RfCode +
                 ",billNumber:" + billNumber +
                 ",issuer:" + issuerVat +
                 ",customer:" + customerVat +
@@ -87,7 +92,7 @@ public class Bill implements Storable {
             String val = keyVal[1].trim();
 
             switch (key) {
-                case "paymentCode" -> this.paymentCode = val;
+                case "paymentCode" -> this.RfCode = val;
                 case "billNumber" -> this.billNumber = val;
                 case "issuer" -> this.issuerVat = val;
                 case "customer" -> this.customerVat = val;

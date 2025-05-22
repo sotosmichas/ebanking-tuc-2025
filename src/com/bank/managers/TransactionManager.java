@@ -59,5 +59,45 @@ public class TransactionManager {
         StatementManager.getInstance().addStatement(fromIban, fromStatement);
         StatementManager.getInstance().addStatement(toIban, toStatement);
     }
+
+    public void submitPayment(String fromIban,String toIban,double amount,String transactor,String senderDescription,String receiverDescription) {
+
+        BankAccount fromAcc = AccountManager.getInstance().getAccountByIban(fromIban);
+        BankAccount toAcc = AccountManager.getInstance().getAccountByIban(toIban);
+
+        if (fromAcc == null || toAcc == null) {
+            throw new IllegalArgumentException("Invalid IBAN(s)");
+        }
+
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Payment amount must be positive");
+        }
+
+        if (fromAcc.getBalance() < amount) {
+            throw new IllegalStateException("Insufficient funds");
+        }
+
+        fromAcc.withdraw(amount);
+        toAcc.deposit(amount);
+
+        LocalDate now = LocalDate.now();
+
+        Statements fromStatement = new Statements(
+                now,
+                senderDescription + " [By: " + transactor + "]",
+                -amount,
+                fromAcc.getBalance()
+        );
+
+        Statements toStatement = new Statements(
+                now,
+                receiverDescription + " [By: " + transactor + "]",
+                amount,
+                toAcc.getBalance()
+        );
+
+        StatementManager.getInstance().addStatement(fromIban, fromStatement);
+        StatementManager.getInstance().addStatement(toIban, toStatement);
+    }
 }
 

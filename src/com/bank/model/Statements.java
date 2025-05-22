@@ -7,12 +7,18 @@ public class Statements {
     private String description;
     private double amount;
     private double balance;
+    private double balanceAfter;
+
 
     public Statements(LocalDate date, String description, double amount, double balance) {
         this.date = date;
         this.description = description;
         this.amount = amount;
         this.balance = balance;
+    }
+
+    public double getBalanceAfter() {
+        return balanceAfter;
     }
 
     public LocalDate getDate() {

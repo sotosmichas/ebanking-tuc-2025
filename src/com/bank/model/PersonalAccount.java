@@ -15,11 +15,11 @@ public class PersonalAccount extends BankAccount {
     }
 
 
-    public Set<Individual> getSecondaryHolders() {
+    public Set<Individual> getCoOwners() {
         return coOwners;
     }
 
-    public void addSecondaryHolder(Individual individual) {
+    public void addCoOwners(Individual individual) {
         coOwners.add(individual);
     }
 

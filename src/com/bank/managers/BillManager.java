@@ -5,6 +5,7 @@ import com.bank.storage.BillCollection;
 import com.bank.storage.StorageManager;
 import com.bank.storage.StorageManagerImpl;
 import com.bank.util.DateUtils;
+import com.bank.util.IdGenerator;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +27,13 @@ public class BillManager {
         issuedBills = new ArrayList<>();
     }
 
+    public static BillManager getInstance() {
+        if (instance == null) {
+            instance = new BillManager();
+        }
+        return instance;
+    }
+
     public List<Bill> getIssuedBills() {
         return issuedBills;
     }
@@ -34,12 +42,70 @@ public class BillManager {
         return paidBills;
     }
 
-    public static BillManager getInstance() {
-        if (instance == null) {
-            instance = new BillManager();
-        }
-        return instance;
+    public List<Bill> getAllBills() {
+        List<Bill> all = new ArrayList<>();
+        all.addAll(issuedBills);
+        all.addAll(paidBills);
+        return all;
     }
+
+    public Bill getBillByNumber(String billNumber) {
+        for (Bill bill : issuedBills) {
+            if (bill.getBillNumber().equals(billNumber)) {
+                return bill;
+            }
+        }
+        return null;
+    }
+
+    public List<Bill> getIssuedBillsByCompany(String companyVat) {
+        List<Bill> result = new ArrayList<>();
+        for (Bill bill : issuedBills) {
+            if (bill.getIssuer().getVat().equals(companyVat)) {
+                result.add(bill);
+            }
+        }
+        return result;
+    }
+
+    public List<Bill> getPaidBillsByCompany(String companyVat) {
+        List<Bill> result = new ArrayList<>();
+        for (Bill bill : paidBills) {
+            if (bill.getIssuer().getVat().equals(companyVat)) {
+                result.add(bill);
+            }
+        }
+        return result;
+    }
+    public Bill createBill(Company issuer, String customerVat, double amount, String description, LocalDate dueDate) {
+        if (issuer == null) throw new IllegalArgumentException("Issuer company cannot be null.");
+        if (customerVat == null || customerVat.isEmpty()) throw new IllegalArgumentException("Customer VAT is required.");
+        if (amount <= 0) throw new IllegalArgumentException("Amount must be positive.");
+        if (dueDate == null || dueDate.isBefore(LocalDate.now())) throw new IllegalArgumentException("Due date must be in the future.");
+
+        String billNumber = IdGenerator.generateTransactionId();
+        String rfCode = IdGenerator.generateRfCode();
+
+        Bill bill = new Bill(billNumber, rfCode, issuer, customerVat, amount, description, dueDate);
+
+        issuedBills.add(bill);
+        return bill;
+    }
+
+
+
+    private String getCompanyIban(Bill bill) {
+        Company company = bill.getIssuer();
+
+        for (BankAccount acc : AccountManager.getInstance().getAllAccounts().values()) {
+            if (acc.getOwner().equals(company)) {
+                return acc.getIban();
+            }
+        }
+
+        throw new IllegalStateException("No bank account found for company " + company.getUsername());
+    }
+
 
     public void payBill(Bill bill) {
         if (bill == null) {
@@ -73,19 +139,25 @@ public class BillManager {
             throw new IllegalStateException("Insuficient funds for this payment");
         }
 
-        account.withdraw(bill.getAmount());
-        bill.setPaid(true);
+        String companyIban = getCompanyIban(bill);
 
-        Statements s = new Statements(
-                LocalDate.now(),
-                "Bill pay",
-                -bill.getAmount(),
-                account.getBalance()
-        );
-        StatementManager.getInstance().addStatement(account.getIban(), s);
+        try {
+            TransactionManager.getInstance().submitPayment(
+                    account.getIban(),
+                    companyIban,
+                    bill.getAmount(),
+                    "BANK",
+                    "Πληρωμή λογαριασμού (RF: " + bill.getRfCode() + ")",
+                    "Είσπραξη από πελάτη για λογαριασμό"
+            );
 
-        issuedBills.remove(bill);
-        paidBills.add(bill);
+            bill.setPaid(true);
+            issuedBills.remove(bill);
+            paidBills.add(bill);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Payment failed: " + e.getMessage(), e);
+        }
     }
 
     public void loadDailyBills(LocalDate date) {

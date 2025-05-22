@@ -5,11 +5,18 @@ import com.bank.managers.UserManager;
 import java.time.LocalDate;
 
 public class BusinessAccount extends BankAccount {
+    private double maintenanceFee;
 
 
-    public BusinessAccount(String iban, double balance, Company ownerVat, LocalDate dateCreated, double interestRate) {
+
+    public BusinessAccount(String iban, double balance, Company ownerVat, LocalDate dateCreated, double interestRate,double maintenanceFee) {
         super(iban, balance, ownerVat, dateCreated, interestRate);
+        this.maintenanceFee=maintenanceFee;
 
+    }
+
+    public double getMaintenanceFee() {
+        return maintenanceFee;
     }
 
     @Override

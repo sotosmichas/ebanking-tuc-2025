@@ -40,7 +40,7 @@
             for (String line : lines) {
 
                 if (line.trim().isEmpty()) continue;
-                Bill bill = new Bill("", "", "", "", 0.0, null, null); // temporary empty object
+                Bill bill = new Bill(); // temporary empty object
                 bill.unmarshal(line);
                 addBill(bill);
             }

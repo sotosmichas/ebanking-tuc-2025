@@ -2,9 +2,6 @@
 import com.bank.model.*;
 import com.bank.storage.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 public class Main {
     public static void main(String[] args) {
@@ -19,7 +16,7 @@ public class Main {
 
 
             for (Bill bill : billCollection.getBills()) {
-                System.out.println("Type: "+bill.getClass().getSimpleName()+" Payment Code:"+bill.getPaymentCode()+"📌 Bill → " +
+                System.out.println("Type: "+bill.getClass().getSimpleName()+" Payment Code:"+bill.getRfCode()+"📌 Bill → " +
                         bill.getBillNumber() + " | Customer: " + bill.getCustomerVat() +
                         " | Amount: " + bill.getAmount() + "€ | Due: " + bill.getDueDate());
             }

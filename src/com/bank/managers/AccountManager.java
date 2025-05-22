@@ -1,6 +1,8 @@
 package com.bank.managers;
 
 import com.bank.model.BankAccount;
+import com.bank.model.BusinessAccount;
+import com.bank.model.Customer;
 import com.bank.model.User;
 
 import java.util.HashMap;
@@ -23,19 +25,23 @@ public class AccountManager {
     public BankAccount getAccountByIban(String iban) {
         return accounts.get(iban);
     }
+    public BusinessAccount getBusinessAccountByVat(String vat) {
+        for (BankAccount acc : accounts.values()) {
+            if (acc instanceof BusinessAccount) {
+                User owner = acc.getOwner();
+                if (owner instanceof Customer customer && customer.getVat().equals(vat)) {
+                    return (BusinessAccount) acc;
+                }
+            }
+        }
+        throw new IllegalArgumentException("No business account found for VAT: " + vat);
+    }
 
     public void addAccount(BankAccount account){
         accounts.put(account.getIban(),account);
     }
     public Map<String, BankAccount> getAllAccounts(){
         return accounts;
-    }/*des mhpws kaneis lista giati borei na exei panw apo 1 account kathe anthrwopos
-    public BankAccount getAccountsByVat(String vat){
-        for(BankAccount b:accounts.values()) {
-            if (b.getOwnerVat().equals(vat))
-                return b;
-        }
-        return null;
-    }*/
+    }
 
 }
